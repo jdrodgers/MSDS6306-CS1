@@ -6,7 +6,7 @@ output:
   pdf_document: default
   html_document: default
 ---
-#Still need to finish Question 5
+
 
 #Question 1
 
@@ -54,6 +54,13 @@ barplot(ABV.medians.by.state$ABV,names.arg=ABV.medians.by.state$State,xlab="ABV"
 
 barplot(IBU.medians.by.state$IBU,names.arg=IBU.medians.by.state$State,xlab="IBU",ylab="States",col="blue",
         main="IBU by State",horiz = T, las = 1,border="red")
+```
+
+#Question 5
+```{r}
+Merged_beers_breweries[which(Merged_beers_breweries$ABV == max(Merged_beers_breweries$ABV,na.rm=T)),10]
+
+Merged_beers_breweries[which(Merged_beers_breweries$IBU == max(Merged_beers_breweries$IBU,na.rm=T)),10]
 ```
 #Question 6
 
