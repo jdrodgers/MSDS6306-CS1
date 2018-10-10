@@ -5,17 +5,9 @@ date: "October 8, 2018"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
+#Question 1
+```{r}
 Beers <- read.csv("~/Desktop/MSDS6306-CS1/Beers.csv")
 View(Beers)
 Breweries <- read.csv("~/Desktop/MSDS6306-CS1/Breweries.csv")
@@ -24,12 +16,59 @@ breweries.by.state <- table(Breweries$State)
 breweries.by.state
 ```
 
-## Including Plots
+#Question 2
+```{r}
+colnames(Beers)[colnames(Beers)=="Brewery_id"] <- "Brew_ID"
+Merged_beers_breweries <- merge(Beers,Breweries, by ="Brew_ID")
+colnames(Merged_beers_breweries)[colnames(Merged_beers_breweries)=="Name.x"] <- "Beer Name"
+colnames(Merged_beers_breweries)[colnames(Merged_beers_breweries)=="Name.y"] <- "Brewery"
+head(Merged_beers_breweries)
+tail(Merged_beers_breweries)
+```
+#Question 3
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+sapply(Beers,function(x) sum(is.na(x)))
+sapply(Breweries, function(x) sum(is.na(x)))
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+#Question 4
+
+``` {r}
+library(plyr)
+ABV.medians.by.state <- ddply(Merged_beers_breweries, "State", function(Merged_beers_breweries) median(Merged_beers_breweries$ABV,na.rm=T))
+colnames(ABV.medians.by.state)[colnames(ABV.medians.by.state)=="V1"] <- "ABV"
+ABV.medians.by.state
+
+IBU.medians.by.state <- ddply(Merged_beers_breweries, "State", function(Merged_beers_breweries) median(Merged_beers_breweries$IBU,na.rm=T))
+colnames(IBU.medians.by.state)[colnames(IBU.medians.by.state)=="V1"] <- "IBU"
+IBU.medians.by.state
+class(IBU.medians.by.state)
+
+
+barplot(ABV.medians.by.state$ABV,names.arg=ABV.medians.by.state$State,xlab="ABV",ylab="States",col="blue",
+        main="ABV by State",horiz = T,las = 1,border="red")
+
+
+barplot(IBU.medians.by.state$IBU,names.arg=IBU.medians.by.state$State,xlab="IBU",ylab="States",col="blue",
+        main="IBU by State",horiz = T, las = 1,border="red")
+```
+#Question 6
+
+```{r}
+hist(Merged_beers_breweries$ABV)
+summary(Merged_beers_breweries$ABV)
+sd(Merged_beers_breweries$ABV,na.rm=T)
+```
+
+#Question 7
+```{r}
+linearMod <- lm(ABV ~ IBU, data=Merged_beers_breweries)  # build linear regression model on full data
+print(linearMod)
+abline(lm(Merged_beers_breweries$IBU ~ Merged_beers_breweries$ABV))
+
+scatter.smooth(x=Merged_beers_breweries$IBU, y=Merged_beers_breweries$ABV, main="Bitterness vs. Alcohol Content")
+```
+
+
+#Plots
