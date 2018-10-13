@@ -11,9 +11,9 @@ output:
 #Question 1
 
 ```{r}
-Beers <- read.csv("~/Desktop/MSDS6306-CS1/Beers.csv")
+Beers <- read.csv("Beers.csv")
 View(Beers)
-Breweries <- read.csv("~/Desktop/MSDS6306-CS1/Breweries.csv")
+Breweries <- read.csv("Breweries.csv")
 View(Breweries)
 breweries.by.state <- table(Breweries$State)
 breweries.by.state
