@@ -1,0 +1,91 @@
+---
+title: "MSDS6306 Case Study 1"
+author: "John Rodgers, Adam Scheerer, Sara Zaheri"
+date: "October 13, 2018"
+output: html_document
+---
+
+# Purpose
+This study analyzes two data sets related to beer (breweries and the beer). The number of breweries for each state will be totaled and then We will look at the bitterness (IBU) and alcohol by volume (ABV) per state for all breweries in that state. We then will look further into the relationship between IBU and ABV and see if there is a correlation.
+
+# Load Data
+
+```{r load-data, echo=TRUE}
+# Load Beers data
+Beers <- read.csv("Beers.csv")
+# Load Breweries data
+Breweries <- read.csv("Breweries.csv")
+# Adjust brewery ID column of Beers dataset to match brewery ID column name of Breweries dataset
+colnames(Beers) [colnames(Beers)=="Brewery_id"] <- "Brew_ID"
+```
+
+# Question 1 - How Many breweries are in each state?
+
+```{r q1, echo=TRUE}
+breweries.by.state <- table(Breweries$State)
+breweries.by.state
+```
+
+# Question 2 - Merge the two data files together and show the first 6 and last 6 rows of the data.
+
+```{r q2, echo=TRUE}
+#Merge 2 dataframes by column "Brew_ID"
+beer.data.merged <- merge(Beers,Breweries, by ="Brew_ID")
+#Clarify naming of "Name" columns
+colnames(beer.data.merged)[colnames(beer.data.merged)=="Name.x"] <- "Beer.Name"
+colnames(beer.data.merged)[colnames(beer.data.merged)=="Name.y"] <- "Brewery.Name"
+#Display first 6 lines
+head(beer.data.merged,6)
+#Display last 6 lines
+tail(beer.data.merged,6)
+```
+# Question 3 - Display the number of NA values for each column
+
+```{r q3, echo=TRUE}
+colSums(is.na(beer.data.merged))
+```
+
+# Question 4 - Compute and plot the median ABV and IBU for each state
+
+```{r q4, fig.height=10, echo=TRUE}
+#Calculate median ABV by State
+med.ABV<-tapply(beer.data.merged$ABV, beer.data.merged$State, median)
+#Calculate median IBU by State
+med.IBU<-tapply(beer.data.merged$IBU, beer.data.merged$State, median)
+head(med.ABV)
+head(med.IBU)
+#Load ggplot2
+library(ggplot2)
+#Generate ABV and IBU by State
+state.data <- merge(aggregate(IBU ~ State, beer.data.merged, median),aggregate(ABV ~ State, beer.data.merged, median),by="State")
+#Plot IBU and ABV
+ggplot(state.data)  + 
+  geom_bar(aes(x=State, y=IBU),stat="identity", fill="goldenrod3") + geom_line(aes(x=State, y=ABV*1000, group=1),stat="identity") + coord_flip() + scale_y_continuous(sec.axis = sec_axis(~./10, name="ABV%"))
+
+```
+
+# Question 5 - Which state has the maximum ABV and which has the maximum IBU?
+
+```{r q5, echo=TRUE}
+#Highest ABV
+beer.data.merged[which.max(beer.data.merged$ABV),]
+#Highest IBU
+beer.data.merged[which.max(beer.data.merged$IBU),]
+```
+
+# Question 6 - Display the summary statistics of ABV
+
+``` {r q6, echo=TRUE}
+summary(beer.data.merged$ABV)
+```
+
+#7 Question 7 - Display a scatterplot to show the relationship between bitterness and ABV
+```{r q7, echo=TRUE}
+#Display scatterplot of ABV vs IBU, including linear model and confidence interval
+ggplot(beer.data.merged, aes(x=IBU, y=ABV)) + geom_point() + geom_smooth(method=lm)
+cor.test(beer.data.merged$ABV,beer.data.merged$IBU)
+```
+
+# Conclusion
+
+With a p-value < .0001 there is significant evidence that the null hypothesis that there is a correlation between the ABV and IBU of beers. We can be 95% confident that the correlation between ABU and IBU is between .64 and .70. It iss  worth noting that 1005 beers out of 2410 do not have an IBU value, excluding them from this correlation analysis.
