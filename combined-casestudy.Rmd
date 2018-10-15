@@ -2,7 +2,9 @@
 title: "MSDS6306 Case Study 1"
 author: "John Rodgers, Adam Scheerer, Sara Zaheri"
 date: "October 13, 2018"
-output: html_document
+output:
+  html_document:
+    keep_md: yes
 ---
 
 # Purpose
@@ -20,66 +22,84 @@ colnames(Beers) [colnames(Beers)=="Brewery_id"] <- "Brew_ID"
 ```
 
 # Question 1 - How Many breweries are in each state?
-
+The following table displays the count of breweries for each state in the United States and the District of Columbia.
 ```{r q1, echo=TRUE}
-breweries.by.state <- table(Breweries$State)
-breweries.by.state
+#load data.table package
+library(data.table)
+#generate datatable with count of breweries for each state
+breweries.by.state <- data.table(table(Breweries$State))
+#assign variable names to datatable
+colnames(breweries.by.state) <- c("State","Count")
+#load knitr package
+library(knitr)
+kable(breweries.by.state)
 ```
 
 # Question 2 - Merge the two data files together and show the first 6 and last 6 rows of the data.
-
+For further analysis, the 2 files will be merged.  The following two tables display the first 6 rows and last 6 rows of the new combined dataset.
 ```{r q2, echo=TRUE}
 #Merge 2 dataframes by column "Brew_ID"
 beer.data.merged <- merge(Beers,Breweries, by ="Brew_ID")
 #Clarify naming of "Name" columns
-colnames(beer.data.merged)[colnames(beer.data.merged)=="Name.x"] <- "Beer.Name"
-colnames(beer.data.merged)[colnames(beer.data.merged)=="Name.y"] <- "Brewery.Name"
-#Display first 6 lines
-head(beer.data.merged,6)
-#Display last 6 lines
-tail(beer.data.merged,6)
-```
-# Question 3 - Display the number of NA values for each column
+colnames(beer.data.merged)[colnames(beer.data.merged)=="Name.x"] <- "Beer Name"
+colnames(beer.data.merged)[colnames(beer.data.merged)=="Name.y"] <- "Brewery Name"
 
+#Display first 6 lines
+kable(head(beer.data.merged,6))
+#Display last 6 lines
+kable(tail(beer.data.merged,6))
+```
+
+# Question 3 - Display the number of NA values for each column
+In order to identify missing values in the dataset, the following table displays the number of records with missing values for each of the following columns in the data.
 ```{r q3, echo=TRUE}
-colSums(is.na(beer.data.merged))
+kable(colSums(is.na(beer.data.merged)), col.names=c("Count"))
 ```
 
 # Question 4 - Compute and plot the median ABV and IBU for each state
-
+In order to visually analyze the median ABV as compared to the median IBU for each state to determine if there is a relationship between the two variables, the following chart displays a barchart of the IBU values compared to a line chart of ABV values.  The scale for the ABV calculations is 1:10 of the scale for IBU, with the scale values displayed on the top for ABV and on the bottle for IBU
 ```{r q4, fig.height=10, echo=TRUE}
 #Calculate median ABV by State
-med.ABV<-tapply(beer.data.merged$ABV, beer.data.merged$State, median)
+med.ABV<-aggregate(IBU ~ State, beer.data.merged, median)
 #Calculate median IBU by State
-med.IBU<-tapply(beer.data.merged$IBU, beer.data.merged$State, median)
-head(med.ABV)
-head(med.IBU)
+med.IBU<-aggregate(ABV ~ State, beer.data.merged, median)
+#Load reshape2
+library(reshape2)
+#Melt data for ggplot2
+IBU <- melt(med.ABV)
+ABV <- melt(med.IBU)
 #Load ggplot2
 library(ggplot2)
-#Generate ABV and IBU by State
-state.data <- merge(aggregate(IBU ~ State, beer.data.merged, median),aggregate(ABV ~ State, beer.data.merged, median),by="State")
 #Plot IBU and ABV
-ggplot(state.data)  + 
-  geom_bar(aes(x=State, y=IBU),stat="identity", fill="goldenrod3") + geom_line(aes(x=State, y=ABV*1000, group=1),stat="identity") + coord_flip() + scale_y_continuous(sec.axis = sec_axis(~./10, name="ABV%"))
-
+ggplot() +
+  geom_bar(data=IBU, aes(x=State, y=value, fill=variable),stat = "identity") + 
+  geom_line(data=ABV, aes(x=State, y=value*1000, colour=variable, group=1), stat="identity") +
+  coord_flip() +
+  theme(legend.key = element_blank(), 
+        legend.background = element_rect(colour = 'black', fill = 'white'), 
+        legend.position = "right", legend.title = element_blank(),
+        legend.box.just = "left") +
+  scale_y_continuous(sec.axis = sec_axis(~./10, name="Median ABV%")) +
+  ylab("Median IBU") 
 ```
 
 # Question 5 - Which state has the maximum ABV and which has the maximum IBU?
-
+The beers with the highest ABV values and highest IBU values are displayed in the following tables.
 ```{r q5, echo=TRUE}
 #Highest ABV
-beer.data.merged[which.max(beer.data.merged$ABV),]
+kable(beer.data.merged[which.max(beer.data.merged$ABV),c(2,4:10)], caption="Highest ABV")
 #Highest IBU
-beer.data.merged[which.max(beer.data.merged$IBU),]
+kable(beer.data.merged[which.max(beer.data.merged$IBU),c(2,4:10)], caption="Highest IBU")
 ```
 
 # Question 6 - Display the summary statistics of ABV
-
+The following table displays a numerical analysis of of values of the ABV column.
 ``` {r q6, echo=TRUE}
 summary(beer.data.merged$ABV)
 ```
 
 #7 Question 7 - Display a scatterplot to show the relationship between bitterness and ABV
+The scatterplot below displays further analysis of the relationship between IBU and BV.  The line and the shading around it represents a linear model and the confidence interval.  
 ```{r q7, echo=TRUE}
 #Display scatterplot of ABV vs IBU, including linear model and confidence interval
 ggplot(beer.data.merged, aes(x=IBU, y=ABV)) + geom_point() + geom_smooth(method=lm)
@@ -88,4 +108,4 @@ cor.test(beer.data.merged$ABV,beer.data.merged$IBU)
 
 # Conclusion
 
-With a p-value < .0001 there is significant evidence that the null hypothesis that there is a correlation between the ABV and IBU of beers. We can be 95% confident that the correlation between ABU and IBU is between .64 and .70. It iss  worth noting that 1005 beers out of 2410 do not have an IBU value, excluding them from this correlation analysis.
+With a p-value < .0001 there is significant evidence that the null hypothesis that there is a correlation between the ABV and IBU of beers. We can be 95% confident that the correlation between ABU and IBU is between .64 and .70. It is worth noting that 1005 beers out of 2410 do not have an IBU value, excluding them from this correlation analysis.
