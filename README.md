@@ -1,8 +1,7 @@
 # MSDS6306-CS1
 SMU Data Science - MSDS6306 Doing Data Science - Case Study 1 Subgroup
 
-# Project Title
-Beer and Breweries
+# Beers and Breweries!
 
 ### Introduction
 In the course of being adults many, if not all of us have discovered Beer and the positives and negatives associated with said beverage.
