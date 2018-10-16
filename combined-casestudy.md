@@ -251,7 +251,7 @@ summary(beer.data.merged$ABV)
 ## 0.00100 0.05000 0.05600 0.05977 0.06700 0.12800      62
 ```
 
-#7 Question 7 - Display a scatterplot to show the relationship between bitterness and ABV
+# Question 7 - Display a scatterplot to show the relationship between bitterness and ABV
 The scatterplot below displays further analysis of the relationship between IBU and BV.  The line and the shading around it represents a linear model and the confidence interval.  
 
 ```r
@@ -289,4 +289,4 @@ cor.test(beer.data.merged$ABV,beer.data.merged$IBU)
 
 # Conclusion
 
-With a p-value < .0001 there is significant evidence that the null hypothesis that there is a correlation between the ABV and IBU of beers. We can be 95% confident that the correlation between ABU and IBU is between .64 and .70. It is worth noting that 1005 beers out of 2410 do not have an IBU value, excluding them from this correlation analysis.
+With a p-value < .0001, we have evidence to reject the null hypothesis that the intercept is 0. This is further supported by the confidence interval of .64 to .69 at 95% confidence. Also the r-squared correlation = .6706 squared = .45 which is a fairly strong relationship. It’s safe to say that as one variable increases, the other will increase as well. It is worth noting that 1005 beers out of 2410 do not have an IBU value, excluding them from this correlation analysis.
