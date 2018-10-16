@@ -15,9 +15,9 @@ This study analyzes two data sets related to beer (breweries and the beer). The 
 
 ```r
 # Load Beers data
-Beers <- read.csv("Beers.csv")
+Beers <- read.csv("./Data/Beers.csv")
 # Load Breweries data
-Breweries <- read.csv("Breweries.csv")
+Breweries <- read.csv("./Data/Breweries.csv")
 # Adjust brewery ID column of Beers dataset to match brewery ID column name of Breweries dataset
 colnames(Beers) [colnames(Beers)=="Brewery_id"] <- "Brew_ID"
 ```

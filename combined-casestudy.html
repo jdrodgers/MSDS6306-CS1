@@ -136,9 +136,9 @@ $(document).ready(function () {
 <div id="load-data" class="section level1">
 <h1>Load Data</h1>
 <pre class="r"><code># Load Beers data
-Beers &lt;- read.csv(&quot;Beers.csv&quot;)
+Beers &lt;- read.csv(&quot;./Data/Beers.csv&quot;)
 # Load Breweries data
-Breweries &lt;- read.csv(&quot;Breweries.csv&quot;)
+Breweries &lt;- read.csv(&quot;./Data/Breweries.csv&quot;)
 # Adjust brewery ID column of Beers dataset to match brewery ID column name of Breweries dataset
 colnames(Beers) [colnames(Beers)==&quot;Brewery_id&quot;] &lt;- &quot;Brew_ID&quot;</code></pre>
 </div>
